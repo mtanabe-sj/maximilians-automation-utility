@@ -10,7 +10,7 @@ Any client software capable of COM automation can receive the services. An appli
 
 This is an automation programming library meant for Windows developers and IT professionals. Its main feature is MaxsUtilLib, a COM automation server written in C++. It provides the three automation objects of InputBox, ProgressBox, and VersionInfo. Use them in your script or C# application to quickly gain text input, progress output, and version query capabilities.
 
-The library is accompanied with a couple of example programs. ListFileVersions is a WPF C# application. It uses MaxsUtilLib to list files in a folder, each with version info retrieved from the file's version resource. TestUtil is a console program written in C++. It programmatically tests the automation interfaces of MaxsUtilLib. Run this program to validate a just built MaxsUtilLib.
+The library is accompanied with a couple of example programs. ListFileVersions is a WPF C# application. It uses MaxsUtilLib to list files in a folder, each with version info retrieved from the file's version resource. TestUtil is a console program written in C++. It programmatically tests the automation interfaces of MaxsUtilLib. Run this program to validate a MaxsUtilLib fresh out of the oven.
 
 The distribution also includes a couple of JScript programs. One is TestMaxsUtil.js, a test script for verifying correct installation of the product. The other is stuffCab.js, a script for compressing a directory into a cab. Both demonstrate how the MaxsUtilLib automation objects can be incorporated to instantly gain practical user interface.
 
