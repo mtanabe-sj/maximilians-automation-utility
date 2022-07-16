@@ -1,0 +1,213 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(CDAF66D4-2E82-43D4-9C9C-9F80EF111FCF),
+	version(1.0),
+	helpstring("Maximilian's Utility Library 1.0")
+]
+library MaxsUtilLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	typedef enum {
+		PROGRESSBOXEVENTS_DISPID_CANCEL = 911,
+	} PROGRESSBOXEVENTS_DISPID;
+	typedef enum {
+		PROGRESSBOXSTARTOPTION_DISABLE_CANCEL = 1,
+		PROGRESSBOXSTARTOPTION_SHOW_PROGRESSBAR = 2,
+		PROGRESSBOXSTARTOPTION_APPEND_TO_NOTE = 4,
+		PROGRESSBOXSTARTOPTION_MARQUEE = 8,
+	} PROGRESSBOXSTARTOPTION;
+	typedef enum {
+		PROGRESSBOXMOVEFLAG_NONE = -1,
+		PROGRESSBOXMOVEFLAG_X_Y = 0,
+		PROGRESSBOXMOVEFLAG_CENTER,
+		PROGRESSBOXMOVEFLAG_LEFTTOP,
+		PROGRESSBOXMOVEFLAG_RIGHTTOP,
+		PROGRESSBOXMOVEFLAG_LEFTBOTTOM,
+		PROGRESSBOXMOVEFLAG_RIGHTBOTTOM,
+	} PROGRESSBOXMOVEFLAG;
+
+	typedef enum {
+		IB_BROWSERBUTTONTYPE_NONE = 0,
+		IB_BROWSERBUTTONTYPE_FILE_OPEN,
+		IB_BROWSERBUTTONTYPE_FILE_SAVEAS,
+		IB_BROWSERBUTTONTYPE_FOLDER,
+	} IB_BROWSERBUTTONTYPE;
+	typedef enum {
+		IB_MULTILINE = 0x4,
+		IB_PASSWORD = 0x20,
+		IB_NUMBER = 0x2000,
+	} IB_OPTION;
+
+	[
+		uuid(9D37D10D-26FB-4C40-A919-C4BCFE5ACA83),
+		helpstring("IVersionInfo dual interface"),
+		dual
+	]
+	interface IVersionInfo : IDispatch
+	{
+		[propget, helpstring("Get File of VersionInfo")]
+		HRESULT File([out, retval] BSTR* Value);
+		[propput, helpstring("Set File of VersionInfo")]
+		HRESULT File([in] BSTR NewValue);
+		[propget, helpstring("Get Language of VersionInfo")]
+		HRESULT Language([out, retval] short* Value);
+		[propput, helpstring("Set Language of VersionInfo")]
+		HRESULT Language([in] short NewValue);
+		[propget, helpstring("Get CodePage of VersionInfo")]
+		HRESULT CodePage([out, retval] short* Value);
+		[propput, helpstring("Set CodePage of VersionInfo")]
+		HRESULT CodePage([in] short NewValue);
+		[propget, helpstring("Get MajorVersion of File")]
+		HRESULT MajorVersion([out, retval] long* Value);
+		[propget, helpstring("Get MinorVersion of File")]
+		HRESULT MinorVersion([out, retval] long* Value);
+		[propget, helpstring("Get VersionString of File in format 'major.minor.revision.build'")]
+		HRESULT VersionString([out, retval] BSTR* Value);
+		[helpstring("QueryAttribute")]
+		HRESULT QueryAttribute([in] BSTR Name, [out, retval] VARIANT* Value);
+		[helpstring("QueryTranslation (available attributes are Comments, CompanyName, FileDescription, FileVersion, InternalName, LegalCopyright, LegalTrademarks, OriginalFilename, ProductName, ProductVersion, PrivateBuild, SpecialBuild)")]
+		HRESULT QueryTranslation([in] short TranslationIndex, [out, retval] VARIANT* LangCode);
+	};
+
+	[
+		uuid(EB39D919-3E94-4A28-9230-FEA9AB1FF285),
+	]
+	coclass VersionInfo
+	{
+		[default] interface IVersionInfo;
+	};
+
+	[
+		uuid(f7d9d3e6-b500-427f-950d-c232d79e047a),
+		helpstring("IInputBox Interface"),
+		dual
+	]
+	interface IInputBox : IDispatch
+	{
+		[propput, helpstring("Caption")]
+		HRESULT Caption([in] BSTR NewValue);
+		[propget, helpstring("Caption")]
+		HRESULT Caption([out, retval] BSTR* Value);
+		[propput, helpstring("Note (shown under input field)")]
+		HRESULT Note([in] BSTR NewValue);
+		[propget, helpstring("Note")]
+		HRESULT Note([out, retval] BSTR* Value);
+		[propput, helpstring("CheckBox (assign text to unhide the box)")]
+		HRESULT CheckBox([in] BSTR NewValue);
+		[propget, helpstring("CheckBox")]
+		HRESULT CheckBox([out, retval] BSTR* Value);
+		[propput, helpstring("Options (assign IB_MULTILINE, IB_PASSWORD or IB_NUMBER)")]
+		HRESULT Options([in] VARIANT NewValue);
+		[propget, helpstring("Options")]
+		HRESULT Options([out, retval] VARIANT* Value);
+		[propput, helpstring("InitialValue (text to initialize input field)")]
+		HRESULT InitialValue([in] BSTR NewValue);
+		[propget, helpstring("InitialValue")]
+		HRESULT InitialValue([out, retval] BSTR* Value);
+		[propget, helpstring("InputValue (text or numbers a user enters)")]
+		HRESULT InputValue([out, retval] BSTR* Value);
+		[propput, helpstring("Checked (set it to True to place a check mark in advance)")]
+		HRESULT Checked([in] VARIANT_BOOL NewValue);
+		[propget, helpstring("Checked (indicates CheckBox is checked or not)")]
+		HRESULT Checked([out, retval] VARIANT_BOOL* Value);
+		[propput, helpstring("BrowserButtonType")]
+		HRESULT BrowserButtonType([in] IB_BROWSERBUTTONTYPE NewValue);
+		[propget, helpstring("BrowserButtonType")]
+		HRESULT BrowserButtonType([out, retval] IB_BROWSERBUTTONTYPE* Value);
+		[propput, helpstring("FileFilter (specifies a file filter for file browser dialog and enables browse button)")]
+		HRESULT FileFilter([in] BSTR NewValue);
+		[propget, helpstring("FileFilter")]
+		HRESULT FileFilter([out, retval] BSTR* Value);
+		[helpstring("method Show (returns number of characters of input text, or -1 if canceled)")]
+		HRESULT Show([in] BSTR PromptMessage, [in, optional] VARIANT *ParentWindow, [out, retval] long *Result);
+	};
+
+	[
+		uuid(0edc407b-0012-4855-89f5-58253c7fa236),
+	]
+	coclass InputBox
+	{
+		[default] interface IInputBox;
+	};
+
+	[
+		uuid(7ca2766d-42eb-4085-abd6-4925dbf669a3),
+		helpstring("IProgressBox dual interface"),
+		dual
+	]
+	interface IProgressBox : IDispatch
+	{
+		[propget, helpstring("Caption")]
+		HRESULT Caption([out, retval] BSTR* Value);
+		[propput, helpstring("Caption")]
+		HRESULT Caption([in] BSTR NewValue);
+		[propget, helpstring("Message")]
+		HRESULT Message([out, retval] BSTR* Value);
+		[propput, helpstring("Message")]
+		HRESULT Message([in] BSTR NewValue);
+		[propget, helpstring("Note")]
+		HRESULT Note([out, retval] BSTR* Value);
+		[propput, helpstring("Note")]
+		HRESULT Note([in] BSTR NewValue);
+		[propget, helpstring("LowerBound")]
+		HRESULT LowerBound([out, retval] long* Value);
+		[propput, helpstring("LowerBound")]
+		HRESULT LowerBound([in] long NewValue);
+		[propget, helpstring("UpperBound")]
+		HRESULT UpperBound([out, retval] long* Value);
+		[propput, helpstring("UpperBound")]
+		HRESULT UpperBound([in] long NewValue);
+		[propget, helpstring("ProgressPos")]
+		HRESULT ProgressPos([out, retval] long* Value);
+		[propput, helpstring("ProgressPos")]
+		HRESULT ProgressPos([in] long NewValue);
+		[propget, helpstring("Canceled")]
+		HRESULT Canceled([out, retval] VARIANT_BOOL* Value);
+		[propget, helpstring("Visible")]
+		HRESULT Visible([out, retval] VARIANT_BOOL* Value);
+		[propput, helpstring("Visible")]
+		HRESULT Visible([in] VARIANT_BOOL NewValue);
+		[propget, helpstring("BarColor")]
+		HRESULT BarColor([out, retval] long* Value);
+		[propput, helpstring("BarColor (set to an RGB value; defaults to CLR_DEFAULT (0xFF000000))")]
+		HRESULT BarColor([in] long NewValue);
+		[propget, helpstring("WindowHandle"), hidden]
+		HRESULT WindowHandle([out, retval] OLE_HANDLE* Value);
+		[helpstring("ShowProgressBar")]
+		HRESULT ShowProgressBar();
+		[helpstring("HideProgressBar")]
+		HRESULT HideProgressBar();
+		[helpstring("Start (Options can be set to PROGRESSBOXSTARTOPTION)")]
+		HRESULT Start([in, optional] VARIANT *Options, [in, optional] VARIANT *Params);
+		[helpstring("Stop")]
+		HRESULT Stop();
+		[helpstring("Increment (adds 1 or Step to current progress position)")]
+		HRESULT Increment([in, optional] VARIANT *Step);
+		[helpstring("Move (Flags can be set to PROGRESSBOXMOVEFLAG)")]
+		HRESULT Move([in] VARIANT Flags, [in, optional] VARIANT *X, [in, optional] VARIANT *Y);
+	};
+
+	[
+		uuid(1eaf0bc0-4b46-480c-9fe0-065ff395ccb8),
+		helpstring("ProgressBoxEvents Interface")
+	]
+	dispinterface ProgressBoxEvents
+	{
+	properties:
+	methods:
+		[id(PROGRESSBOXEVENTS_DISPID_CANCEL)] void Cancel([in, out] VARIANT_BOOL* CanCancel);
+	};
+
+	[
+		uuid(229c46e4-2d2d-4e5d-bce5-3ff50c20dce1),
+	]
+	coclass ProgressBox
+	{
+		[default] interface IProgressBox;
+		[default, source] dispinterface ProgressBoxEvents;
+	};
+};

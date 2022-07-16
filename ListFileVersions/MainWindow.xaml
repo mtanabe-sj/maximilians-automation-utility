@@ -1,0 +1,35 @@
+﻿<Window x:Class="ListFileVersions.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ListFileVersions"
+        mc:Ignorable="d"
+        Title="File Version List" Height="450" Width="800" Icon="app.ico" SizeChanged="Window_SizeChanged">
+    <Grid>
+		<Button x:Name="FolderOpenButton" Content="Folder..." Margin="4,6,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+		<TextBox x:Name="FolderPath" Margin="0,4,4,0" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" TextWrapping="Wrap" Width="694" IsReadOnly="True"/>
+		<ListView x:Name="FileVersionList" Margin="4,0,4,4" HorizontalAlignment="Stretch" Height="374"  VerticalAlignment="Bottom">
+			<ListView.View>
+				<GridView>
+					<GridViewColumn Width="120"
+                            DisplayMemberBinding="{Binding FileName}"
+                            Header="File Name" />
+					<GridViewColumn Width="50"
+                            DisplayMemberBinding="{Binding FileVersion}"
+                            Header="Version" />
+					<GridViewColumn Width="100"
+                            DisplayMemberBinding="{Binding ProductName}"
+                            Header="Product" />
+					<GridViewColumn Width="50"
+                            DisplayMemberBinding="{Binding ProductVersion}"
+                            Header="Version" />
+					<GridViewColumn Width="400"
+                            DisplayMemberBinding="{Binding FileDescription}"
+                            Header="Description" />
+				</GridView>
+			</ListView.View>
+		</ListView>
+
+	</Grid>
+</Window>
