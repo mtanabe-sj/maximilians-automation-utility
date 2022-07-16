@@ -25,6 +25,9 @@ Prerequisites:
 
 MSI installers are available, if you don't want to be bothered with the source code and building the dll yourself. Install the library, and start incorporating the automation objects into your application.
 
+* [x64 msi](https://github.com/mtanabe-sj/maximilians-automation-utility/blob/main/installer/out/MaxsUtil64.msi)
+* [x86 msi](https://github.com/mtanabe-sj/maximilians-automation-utility/blob/main/installer/out/MaxsUtil86.msi)
+
 
 ## Using MaxsUtilLib
 
