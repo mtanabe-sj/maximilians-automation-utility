@@ -56,9 +56,6 @@ var params = new cabParams;
 if (!params.configure(WScript.Arguments.length > 0? WScript.Arguments(0):""))
   WScript.Quit(2); // canceled. quit.
 
-log.write("SOURCE DIRECTORY", params.srcDir);
-log.write("CAB OUTPUT PATH", params.destCAB);
-
 // create a ProgressBox and start a status display.
 var progress = new ActiveXObject("MaxsUtilLib.ProgressBox");
 progress.Caption = WScript.ScriptName;
@@ -97,7 +94,7 @@ if (progress.Canceled)
 if (wideNames > 0) {
 	log.write(WScript.ScriptName+" Interrupted.");
 	wsh.Run("Notepad \""+log._path+"\"");
-  if (IDCANCEL == wsh.Popup("Your directory contains file(s) with wide character(s). Compression tool (MAKECAB) does not support a file name in Unicode. Refer to the log for the names. Either rename them, or move them out of the directory. Or, choose Retry to ignore and try to continue without the problem file(s).", 0, WScript.ScriptName, MB_RETRYCANCEL|MB_DEFBUTTON2))
+  if (IDCANCEL == wsh.Popup("Your directory contains file(s) with foreign name(s). Compression tool (MAKECAB) does not support file names with wide characters. Refer to the log for the problem name(s). Either cancel and rename them, or move them out of the directory. Or, choose Retry to ignore and try to continue without the problem file(s).", 0, WScript.ScriptName, MB_RETRYCANCEL|MB_DEFBUTTON2))
     WScript.Quit(1);
 	log.write(WScript.ScriptName+" Resuming.");
 }
@@ -190,6 +187,7 @@ function cabParams() {
 	this.includeNested = false;
 	this.srcDir = "";
 	this.srcName = "";
+	this.srcIsRoot = false;
 
 	this.configure = function(initialDirectoryPath) {
 		var excludedDirectories = "";
@@ -218,10 +216,26 @@ function cabParams() {
 
 		this.includeNested = inputbox.Checked;
 		this.srcDir = inputbox.InputValue;
-		this.srcName = fso.GetFolder(this.srcDir).Name;
-		this.destCAB = this.srcDir+".cab";
 		this.diskDir = wsh.ExpandEnvironmentStrings("%TEMP%");
 		this.tmpDir = this.diskDir+"\\";
+		if (this.srcDir.length < 3) {
+			WScript.Echo("Invalid or ambiguous directory path.");
+			return false; // a root specifier alone is too ambiguous. a drive letter must be specified.
+		}
+		if (this.srcDir.length==3 && this.srcDir.charAt(1)==':' && this.srcDir.charAt(2)=='\\') {
+			// for the root directory on a drive, put the cab in %TEMP%.
+			this.srcIsRoot = true;
+			this.srcName = "Drive-"+this.srcDir.charAt(0);
+			this.destCAB = this.tmpDir+this.srcName+".cab";
+		} else if (this.srcDir.charAt(0)=='\\' && this.srcDir.charAt(1)=='\\') {
+			// for a directory in a network path, put the cab in %TEMP%.
+			this.srcName = fso.GetFolder(this.srcDir).Name;
+			this.destCAB = this.tmpDir+this.srcName+".cab";
+		} else {
+			// otherwise, put the cab in the same parent directory as the source's.
+			this.srcName = fso.GetFolder(this.srcDir).Name;
+			this.destCAB = this.srcDir+".cab";
+		}
 		this.tmpDDF = this.tmpDir+this.tmpPrefix+this.srcName+".ddf";
 		this.tmpBAT = this.tmpDir+this.tmpPrefix+this.srcName+".bat";
 		this.tmpCAB = this.tmpDir+this.tmpPrefix+this.srcName+".cab";
@@ -229,6 +243,9 @@ function cabParams() {
 		this.destDrive = this.destCAB.substr(0,2);
 		this.excludedDirs = excludedDirectories.split(",");
 		this.excludedExts = excludedFileExtensions.split(",");
+
+		log.write(this.srcIsRoot? "SOURCE DRIVE" : "SOURCE DIRECTORY", this.srcDir);
+		log.write("CAB OUTPUT PATH", this.destCAB);
 
 		try {
 			wsh.RegWrite(APPREGKEY+"InitialDirectoryPath", this.srcDir, "REG_SZ");
@@ -277,6 +294,12 @@ function cabParams() {
 		}
 		return true;
 	}
+	this.getRelativePath = function(pathname) {
+		if(this.srcIsRoot)
+			return pathname.substr(this.srcDir.length);
+		return pathname.substr(this.srcDir.length+1);
+	}
+
 }
 
 // returns the title part of an input filename. A title is the leading part of the name excluding the trailing part (extension name) separated from the former by a period. The function assumes filename does not contain a directory pathname.
@@ -390,8 +413,19 @@ function writeDirectoryToDDF(dirPath, ddf) {
         return 0;
     }
   }
-  var relPath = fld.Path.substr(params.srcDir.length+1);
-  ddf.WriteLine(".Set DestinationDir=\""+relPath+"\"");
+  var relPath = params.getRelativePath(fld.Path);
+  try {
+    ddf.WriteLine(".Set DestinationDir=\""+relPath+"\"");
+  } catch(e) {
+		// WriteLine throws error 5 if relPath has an international name.
+		log.write("writeDirectoryToDDF caught exception", (e.number & 0xFFFF)+"; "+relPath);
+		if(!isTextInAnsiRange(relPath)) {
+			wideNames++;
+			return 0;
+		}
+		WScript.Echo("Operation aborted due to unacceptable file name:\n\n"+relPath);
+		WScript.Quit(3);
+	}
   var fc = fld.Files;
   var ef = new Enumerator(fc);
   for (; !ef.atEnd(); ef.moveNext()) {
