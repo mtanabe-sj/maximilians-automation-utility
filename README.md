@@ -31,7 +31,7 @@ MSI installers are available, if you don't want to be bothered with the source c
 
 ## Using MaxsUtilLib
 
-Refer to [api.docx](https://github.com/mtanabe-sj/maximilians-automation-utility/blob/main/api.docx). It provides a complete documentation of the automation API of MaxsUtilLib. It also contains programming tips with code samples to help you quickly achieve your automation needs.
+Refer to [api.pdf](https://github.com/mtanabe-sj/maximilians-automation-utility/blob/main/api.pdf). It provides a complete documentation of the automation API of MaxsUtilLib. It also contains programming tips with code samples to help you quickly achieve your automation needs.
 
 
 ## Contributing
